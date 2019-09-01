@@ -12,12 +12,6 @@ includelib c:\masm32\lib\wxp\i386\ntoskrnl.lib
   
 public DriverEntry
  
-OurDeviceExtension struct
-  pNextDev PDEVICE_OBJECT ?
-  szBuffer byte 1024 dup(?)
-  dwBufferLength dword ?
-OurDeviceExtension ends
-
 IOCTL_TEST equ CTL_CODE(FILE_DEVICE_UNKNOWN, 800h, METHOD_BUFFERED, FILE_ANY_ACCESS)
  
 .const
@@ -44,16 +38,6 @@ IrpOpenClose proc uses ebx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
 IrpOpenClose endp
 
 IrpIOCTL proc uses ebx ecx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
-  local dwLen: DWORD
-  local pdx:PTR OurDeviceExtension
-
-  push 0
-  pop dwLen
-
-  mov eax, pOurDevice
-  push (DEVICE_OBJECT PTR [eax]).DeviceExtension
-  pop pdx
-
   IoGetCurrentIrpStackLocation pIrp
   mov eax, (IO_STACK_LOCATION PTR [eax]).Parameters.DeviceIoControl.IoControlCode
   .if eax == IOCTL_TEST
@@ -62,7 +46,7 @@ IrpIOCTL proc uses ebx ecx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
 
   mov eax, pIrp
   mov (_IRP PTR [eax]).IoStatus.Status, STATUS_SUCCESS
-  push dwLen
+  push 0
   pop (_IRP PTR [eax]).IoStatus.Information 
   fastcall IofCompleteRequest, pIrp, IO_NO_INCREMENT
   mov eax, STATUS_SUCCESS
@@ -94,7 +78,7 @@ DriverEntry proc pOurDriver:PDRIVER_OBJECT, pOurRegistry:PUNICODE_STRING
   
   invoke RtlInitUnicodeString, addr suDevName, offset DEV_NAME
   invoke RtlInitUnicodeString, addr szSymName, offset SYM_NAME
-  invoke IoCreateDevice, pOurDriver, sizeof OurDeviceExtension, addr suDevName, FILE_DEVICE_UNKNOWN, 0, FALSE, addr pOurDevice
+  invoke IoCreateDevice, pOurDriver, 0, addr suDevName, FILE_DEVICE_UNKNOWN, 0, FALSE, addr pOurDevice
   .if eax == STATUS_SUCCESS
     mov eax, pOurDevice
     or (DEVICE_OBJECT PTR [eax]).Flags, DO_BUFFERED_IO
