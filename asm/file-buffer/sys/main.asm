@@ -13,7 +13,7 @@ public DriverEntry
  
 OurDeviceExtension struct
   pNextDevice PDEVICE_OBJECT ?
-  szBuffer byte 1024 dup(?)
+  szBuffer byte 255 dup(?)
 OurDeviceExtension ends
 
 .const
@@ -21,13 +21,13 @@ DEV_NAME word "\","D","e","v","i","c","e","\","M","y","D","r","i","v","e","r",0
 SYM_NAME word "\","D","o","s","D","e","v","i","c","e","s","\","M","y","D","r","i","v","e","r",0
   
 .code
-IrpOpenClose proc uses ebx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
+IrpOpenClose proc pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
   IoGetCurrentIrpStackLocation pIrp
-  movzx ebx, (IO_STACK_LOCATION PTR [eax]).MajorFunction
+  movzx eax, (IO_STACK_LOCATION PTR [eax]).MajorFunction
 
-  .if ebx == IRP_MJ_CREATE
+  .if eax == IRP_MJ_CREATE
     invoke DbgPrint, $CTA0("IRP_MJ_CREATE")
-  .elseif ebx == IRP_MJ_CLOSE
+  .elseif eax == IRP_MJ_CLOSE
     invoke DbgPrint, $CTA0("IRP_MJ_CLOSE")
   .endif
 
@@ -39,9 +39,9 @@ IrpOpenClose proc uses ebx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
   ret
 IrpOpenClose endp
  
-IrpReadWrite proc uses ebx ecx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
-  local dwLen:dword
+IrpReadWrite proc uses ebx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
   local pBuf:dword
+  local dwLen:dword
   local pdx:PTR OurDeviceExtension
   
   xor eax, eax
@@ -52,8 +52,8 @@ IrpReadWrite proc uses ebx ecx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
   pop pdx
   
   IoGetCurrentIrpStackLocation pIrp
-  movzx ebx, (IO_STACK_LOCATION PTR [eax]).MajorFunction
-  .if ebx == IRP_MJ_WRITE
+  movzx eax, (IO_STACK_LOCATION PTR [eax]).MajorFunction
+  .if eax == IRP_MJ_WRITE
     invoke DbgPrint, $CTA0("IRP_MJ_WRITE")
     
     IoGetCurrentIrpStackLocation pIrp
@@ -68,7 +68,7 @@ IrpReadWrite proc uses ebx ecx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
     mov eax, pdx
     mov ebx, pBuf
     invoke memcpy, addr (OurDeviceExtension PTR [eax]).szBuffer, ebx, dwLen
-  .elseif ebx == IRP_MJ_READ
+  .elseif eax == IRP_MJ_READ
     invoke DbgPrint, $CTA0("IRP_MJ_READ")
     
     mov eax, pIrp
@@ -108,7 +108,6 @@ Unload proc pOurDriver:PDRIVER_OBJECT
    
   mov eax, pOurDriver
   invoke IoDeleteDevice, (DRIVER_OBJECT PTR [eax]).DeviceObject
-  xor eax, eax
   ret
 Unload endp
 

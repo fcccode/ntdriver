@@ -17,11 +17,11 @@ public DriverEntry
 
 OurDeviceExtension struct
   pNextDev PDEVICE_OBJECT ?
-  stQueue  LIST_ENTRY <>
-  stDPC    KDPC <>
-  stTime   KTIMER <>
-  stCsq    IO_CSQ <>
-  stLock   KSPIN_LOCK <>
+  stQueue  LIST_ENTRY     <>
+  stDPC    KDPC           <>
+  stTime   KTIMER         <>
+  stCsq    IO_CSQ         <>
+  stLock   KSPIN_LOCK     <>
 OurDeviceExtension ends
 
 IOCTL_QUEUE   equ CTL_CODE(FILE_DEVICE_UNKNOWN, 800h, METHOD_BUFFERED, FILE_ANY_ACCESS)
@@ -227,12 +227,12 @@ OnTimer proc uses ebx pDpc:PKDPC, pContext:PVOID, pArg1:PVOID, PArg2:PVOID
   ret
 OnTimer endp
 
-IrpOpenClose proc uses ebx pDevObj:PDEVICE_OBJECT, pIrp:PIRP
+IrpOpenClose proc pDevObj:PDEVICE_OBJECT, pIrp:PIRP
   IoGetCurrentIrpStackLocation pIrp
-  movzx ebx, (IO_STACK_LOCATION PTR [eax]).MajorFunction
-  .if ebx == IRP_MJ_CREATE
+  movzx eax, (IO_STACK_LOCATION PTR [eax]).MajorFunction
+  .if eax == IRP_MJ_CREATE
     invoke DbgPrint, $CTA0("IRP_MJ_CREATE")
-  .elseif ebx == IRP_MJ_CLOSE
+  .elseif eax == IRP_MJ_CLOSE
     invoke DbgPrint, $CTA0("IRP_MJ_CLOSE")
   .endif
 
@@ -244,7 +244,7 @@ IrpOpenClose proc uses ebx pDevObj:PDEVICE_OBJECT, pIrp:PIRP
   ret
 IrpOpenClose endp
 
-IrpIOCTL proc uses ebx ecx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
+IrpIOCTL proc uses ebx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
   local pdx:PTR Dev_Ext
   local stTimePeriod:LARGE_INTEGER
 
@@ -287,7 +287,6 @@ Unload proc pOurDriver:PDRIVER_OBJECT
            
   mov eax, pOurDriver
   invoke IoDeleteDevice, (DRIVER_OBJECT PTR [eax]).DeviceObject
-  xor eax, eax
   ret
 Unload endp
     

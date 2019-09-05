@@ -25,7 +25,7 @@ MSG_LEN   db "Length: %d",10,13,0
 .data?
 hFile     dd ?
 dwRet     dd ?
-szBuffer  db 256 dup(?)
+szBuffer  db 255 dup(?)
 
 .code
 start:

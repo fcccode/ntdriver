@@ -37,8 +37,8 @@ start:
     invoke crt_printf, offset MSG_ERR
     invoke ExitProcess, -1
   .endif
-  mov hFile, eax
   
+  mov hFile, eax
   invoke crt_memset, offset szBuffer, 0, 255
   invoke StrLen, offset MSG_SEND
   inc eax

@@ -23,7 +23,7 @@ MSG_RD   db "RD: %s, %d",10,13,0
 .data?
 hFile    dd ?
 dwRet    dd ?
-szBuffer db 256 dup(?)
+szBuffer db 255 dup(?)
 
 .code
 start:
@@ -32,8 +32,8 @@ start:
     invoke crt_printf, offset MSG_ERR
     invoke ExitProcess, -1
   .endif
+  
   mov hFile, eax
-
   invoke StrLen, offset MSG_SEND
   inc eax
   mov dwRet, eax

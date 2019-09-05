@@ -16,17 +16,17 @@ DEV_NAME word "\","D","e","v","i","c","e","\","M","y","D","r","i","v","e","r",0
 SYM_NAME word "\","D","o","s","D","e","v","i","c","e","s","\","M","y","D","r","i","v","e","r",0
   
 .code
-IrpFile proc uses ebx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
+IrpFile proc pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
   IoGetCurrentIrpStackLocation pIrp
-  movzx ebx, (IO_STACK_LOCATION PTR [eax]).MajorFunction
+  movzx eax, (IO_STACK_LOCATION PTR [eax]).MajorFunction
 
-  .if ebx == IRP_MJ_CREATE
+  .if eax == IRP_MJ_CREATE
     invoke DbgPrint, $CTA0("IRP_MJ_CREATE")
-  .elseif ebx == IRP_MJ_READ
+  .elseif eax == IRP_MJ_READ
     invoke DbgPrint, $CTA0("IRP_MJ_READ")
-  .elseif ebx == IRP_MJ_WRITE
+  .elseif eax == IRP_MJ_WRITE
     invoke DbgPrint, $CTA0("IRP_MJ_WRITE")
-  .elseif ebx == IRP_MJ_CLOSE
+  .elseif eax == IRP_MJ_CLOSE
     invoke DbgPrint, $CTA0("IRP_MJ_CLOSE")
   .endif
 
@@ -46,7 +46,6 @@ Unload proc pOurDriver:PDRIVER_OBJECT
   
   mov eax, pOurDriver
   invoke IoDeleteDevice, (DRIVER_OBJECT PTR [eax]).DeviceObject
-  xor eax, eax
   ret
 Unload endp
 
