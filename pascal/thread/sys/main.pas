@@ -2,19 +2,41 @@ unit main;
 
 interface
   uses 
-    DDDK;
+    DDDK,
+    SysUtils;
     
   const 
     DEV_NAME = '\Device\MyDriver';
     SYM_NAME = '\DosDevices\MyDriver';
-    IOCTL_SET = $222003; // CTL_CODE(FILE_DEVICE_UNKNOWN, 0x800, METHOD_NEITHER, FILE_ANY_ACCESS)
-    IOCTL_GET = $222007; // CTL_CODE(FILE_DEVICE_UNKNOWN, 0x801, METHOD_NEITHER, FILE_ANY_ACCESS)
+    IOCTL_START = $222000; // CTL_CODE(FILE_DEVICE_UNKNOWN, 0x800, METHOD_BUFFERED, FILE_ANY_ACCESS)
+    IOCTL_STOP = $222004; // CTL_CODE(FILE_DEVICE_UNKNOWN, 0x801, METHOD_BUFFERED, FILE_ANY_ACCESS)
     
   function _DriverEntry(pOurDriver:PDriverObject; pOurRegistry:PUnicodeString):NTSTATUS; stdcall;
 
 implementation
 var 
-  szBuffer: array[0..255] of char;
+  bExit: ULONG;
+  pThread: Handle;
+  
+procedure MyThread(pParam:Pointer); stdcall;
+var
+  ps: Pointer;
+  tt: LARGE_INTEGER;
+
+begin
+  tt.HighPart:= tt.HighPart or -1;
+  tt.LowPart:= ULONG(-10000000);
+  ps:= IoGetCurrentProcess();
+  ps:= Pointer(Integer(ps) + $174);
+  DbgPrint('Current process: %s', [ps]);
+  while Integer(bExit) = 0 do
+  begin
+    KeDelayExecutionThread(KernelMode, FALSE, @tt);
+    DbgPrint('Sleep 1s', []);
+  end;
+  DbgPrint('Exit MyThread', []);
+  PsTerminateSystemThread(STATUS_SUCCESS);
+end;
 
 function IrpOpen(pOurDevice:PDeviceObject; pIrp:PIrp):NTSTATUS; stdcall;
 begin
@@ -36,29 +58,34 @@ end;
 
 function IrpIOCTL(pOurDevice:PDeviceObject; pIrp:PIrp):NTSTATUS; stdcall;
 var
-  len: ULONG;
   code: ULONG;
+  hThread: Handle;
+  status: NTSTATUS;
   psk: PIoStackLocation;
 begin
-  len:= 0;
   psk:= IoGetCurrentIrpStackLocation(pIrp);
   code:= psk^.Parameters.DeviceIoControl.IoControlCode;
   case code of 
-  IOCTL_GET:begin
-    DbgPrint('IOCTL_GET', []);
-    len:= strlen(@szBuffer[0])+1;
-    memcpy(pIrp^.UserBuffer, @szBuffer[0], len);
+  IOCTL_START:begin
+    DbgPrint('IOCTL_START', []);
+    bExit:= 0;
+    status:= PsCreateSystemThread(@hThread, THREAD_ALL_ACCESS, Nil, Handle(-1), Nil, MyThread, pOurDevice);
+    if NT_SUCCESS(status) then
+    begin
+      ObReferenceObjectByHandle(hThread, THREAD_ALL_ACCESS, Nil, KernelMode, @pThread, Nil);
+      ZwClose(hThread);
+    end;
   end;
-  IOCTL_SET:begin
-    DbgPrint('IOCTL_SET', []);
-    len:= psk^.Parameters.DeviceIoControl.InputBufferLength;
-    memcpy(@szBuffer[0], psk^.Parameters.DeviceIoControl.Type3InputBuffer, len);
-    DbgPrint('Buffer: %s, Length: %d', [szBuffer, len]);
+  IOCTL_STOP:begin
+    DbgPrint('IOCTL_STOP', []);
+    bExit:= 1;
+    KeWaitForSingleObject(Pointer(pThread), Executive, KernelMode, False, Nil);
+    ObDereferenceObject(pThread);
   end;
   end;
   
   Result:= STATUS_SUCCESS;
-  pIrp^.IoStatus.Information:= len;
+  pIrp^.IoStatus.Information:= 0;
   pIrp^.IoStatus.Status:= Result;
   IoCompleteRequest(pIrp, IO_NO_INCREMENT);
 end;

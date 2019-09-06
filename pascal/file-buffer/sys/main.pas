@@ -3,7 +3,7 @@ unit main;
 interface
   uses 
     DDDK;
-    
+
   const 
     DEV_NAME = '\Device\MyDriver';
     SYM_NAME = '\DosDevices\MyDriver';
@@ -12,7 +12,6 @@ interface
 
 implementation
 var
-  dwLen: ULONG;
   szBuf: array[0..255] of char;
   
 function IrpOpen(pOurDevice:PDeviceObject; pIrp:PIrp):NTSTATUS; stdcall;
@@ -26,47 +25,32 @@ end;
 
 function IrpRead(pOurDevice:PDeviceObject; pIrp:PIrp):NTSTATUS; stdcall;
 var
-  i: ULONG;
-  src: PChar;
-  dst: PChar;
+  len: ULONG;
 begin
   DbgPrint('IRP_MJ_READ', []);
   
-  src:= szBuf;
-  dst:= pIrp^.AssociatedIrp.SystemBuffer;
-  for i:= 0 to dwLen do
-  begin
-    dst[i]:= src[i];
-  end;
-  
+  len:= strlen(@szBuf[0])+1;
+  memcpy(pIrp^.AssociatedIrp.SystemBuffer, @szBuf[0], len);  
   Result:= STATUS_SUCCESS;
-  pIrp^.IoStatus.Information:= dwLen;
+  pIrp^.IoStatus.Information:= len;
   pIrp^.IoStatus.Status:= Result;
   IoCompleteRequest(pIrp, IO_NO_INCREMENT);
 end;
 
 function IrpWrite(pOurDevice:PDeviceObject; pIrp:PIrp):NTSTATUS; stdcall;
 var
-  i: ULONG;
-  src: PChar;
-  dst: PChar;
+  len: ULONG;
   psk: PIoStackLocation;
   
 begin
   DbgPrint('IRP_MJ_WRITE', []);
   
-  dst:= szBuf;
-  src:= pIrp^.AssociatedIrp.SystemBuffer;
   psk:= IoGetCurrentIrpStackLocation(pIrp);
-  dwLen:= psk.Parameters.Write.Length;
-  DbgPrint('Buffer: %s, Length: %d', [src, dwLen]);
-  
-  for i:= 0 to dwLen do
-  begin
-    dst[i]:= src[i];
-  end;
+  len:= psk.Parameters.Write.Length;
+  memcpy(@szBuf[0], pIrp^.AssociatedIrp.SystemBuffer, len);
+  DbgPrint('Buffer: %s, Length: %d', [szBuf, len]);
   Result:= STATUS_SUCCESS;
-  pIrp^.IoStatus.Information:= dwLen;
+  pIrp^.IoStatus.Information:= len;
   pIrp^.IoStatus.Status:= Result;
   IoCompleteRequest(pIrp, IO_NO_INCREMENT);
 end;

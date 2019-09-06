@@ -15,6 +15,9 @@ uses
 
 const
   METHOD_BUFFERED = 0;
+  METHOD_IN_DIRECT = 1;
+  METHOD_OUT_DIRECT = 2;
+  METHOD_NEITHER = 3;
   FILE_ANY_ACCESS = 0;
   FILE_DEVICE_UNKNOWN = $22;
 
@@ -31,14 +34,14 @@ begin
   begin
     StrCopy(buf, 'I am error');
     len:= strlen(buf)+1;
-    set_code:= (FILE_DEVICE_UNKNOWN shl 16) or (FILE_ANY_ACCESS Shl 14) or ($800 shl 2) or (METHOD_BUFFERED);
-    get_code:= (FILE_DEVICE_UNKNOWN shl 16) or (FILE_ANY_ACCESS Shl 14) or ($801 shl 2) or (METHOD_BUFFERED);
+    set_code:= (FILE_DEVICE_UNKNOWN shl 16) or (FILE_ANY_ACCESS shl 14) or ($800 shl 2) or (METHOD_NEITHER);
+    get_code:= (FILE_DEVICE_UNKNOWN shl 16) or (FILE_ANY_ACCESS shl 14) or ($801 shl 2) or (METHOD_NEITHER);
     DeviceIoControl(fd, set_code, @buf, len, Nil, 0, ret, Nil);
     WriteLn(Output, Format('SET: %s, %d', [buf, len]));
 
     FillChar(buf, sizeof(buf), #0);
     DeviceIoControl(fd, get_code, Nil, 0, @buf, len, ret, Nil);
-    WriteLn(Output, Format('GET: %s, %d', [buf, len]));
+    WriteLn(Output, Format('GET: %s, %d', [buf, ret]));
     
     CloseHandle(fd);
   end else

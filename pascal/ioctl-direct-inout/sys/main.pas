@@ -47,7 +47,7 @@ begin
   case code of 
   IOCTL_GET:begin
     DbgPrint('IOCTL_GET', []);
-    len:= strlen(@szBuffer[0]);
+    len:= strlen(@szBuffer[0])+1;
     dst:= MmGetSystemAddressForMdlSafe(pIrp^.MdlAddress, LowPagePriority);
     memcpy(dst, @szBuffer[0], len);
   end;

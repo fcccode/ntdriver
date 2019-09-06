@@ -46,7 +46,7 @@ begin
   case code of 
   IOCTL_GET:begin
     DbgPrint('IOCTL_GET', []);
-    len:= strlen(@szBuffer[0]);
+    len:= strlen(@szBuffer[0])+1;
     memcpy(pIrp^.AssociatedIrp.SystemBuffer, @szBuffer[0], len);
   end;
   IOCTL_SET:begin
