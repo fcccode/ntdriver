@@ -50,7 +50,7 @@ OnTimer proc pDpc:PKDPC, pContext:PVOID, pArg1:PVOID, PArg2:PVOID
     push 0
     pop (_IRP PTR [eax]).IoStatus.Information
     fastcall IofCompleteRequest, eax, IO_NO_INCREMENT
-    invoke DbgPrint, $CTA0("Complete Irp")
+    invoke DbgPrint, $CTA0("Complete Irp %d"), _IRP.Tail.Overlay.ListEntry
   .endif
   ret
 OnTimer endp

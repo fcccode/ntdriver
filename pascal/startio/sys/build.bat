@@ -18,6 +18,7 @@ c:\dddk\bin\omf2d.exe c:\dddk\inc\dddk.obj /U- /CEExAllocatePool=_ExAllocatePool
 c:\dddk\bin\omf2d.exe c:\dddk\inc\dddk.obj /U- /CEKeReleaseMutex=_KeReleaseMutex@8 2>nul
 c:\dddk\bin\omf2d.exe c:\dddk\inc\dddk.obj /U- /CEIoCreateDevice=_IoCreateDevice@28 2>nul
 c:\dddk\bin\omf2d.exe c:\dddk\inc\dddk.obj /U- /CEKeInitializeDpc=_KeInitializeDpc@12 2>nul
+c:\dddk\bin\omf2d.exe c:\dddk\inc\dddk.obj /U- /CEIoStartNextPacket=_IoStartNextPacket@8 2>nul
 c:\dddk\bin\omf2d.exe c:\dddk\inc\dddk.obj /U- /CEIoCompleteRequest=_IoCompleteRequest@8 2>nul
 c:\dddk\bin\omf2d.exe c:\dddk\inc\dddk.obj /U- /CEKeInitializeMutex=_KeInitializeMutex@8 2>nul
 c:\dddk\bin\omf2d.exe c:\dddk\inc\dddk.obj /U- /CEKeInitializeTimer=_KeInitializeTimer@4 2>nul
