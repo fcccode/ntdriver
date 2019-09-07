@@ -174,6 +174,7 @@ NTSTATUS DriverEntry(PDRIVER_OBJECT pOurDriver, PUNICODE_STRING pOurRegistry)
   IoCreateDevice(pOurDriver, 0, &usDeviceName, FILE_DEVICE_UNKNOWN, 0, FALSE, &pOurDevice);
   RtlInitUnicodeString(&usSymboName, L"\\DosDevices\\MyDriver");
   InitializeListHead(&stQueue);
+  KeInitializeSpinLock(&stLock);
   KeInitializeTimer(&stTime);
   KeInitializeDpc(&stDPC, OnTimer, pOurDevice);
   IoCsqInitialize(&stCsq, CsqInsertIrp, CsqRemoveIrp, CsqPeekNextIrp, CsqAcquireLock, CsqReleaseLock, CsqCompleteCanceledIrp);

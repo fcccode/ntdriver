@@ -313,6 +313,11 @@ DriverEntry proc pOurDriver:PDRIVER_OBJECT, pOurRegistry:PUNICODE_STRING
     mov eax, (DEVICE_OBJECT PTR [eax]).DeviceExtension
     lea eax, (OurDeviceExtension PTR [eax]).stQueue
     InitializeListHead eax
+    
+    mov eax, pOurDevice
+    mov eax, (DEVICE_OBJECT PTR [eax]).DeviceExtension
+    lea eax, (OurDeviceExtension PTR [eax]).stLock
+    invoke KeInitializeSpinLock, eax
 
     mov eax, pOurDevice
     mov eax, (DEVICE_OBJECT PTR [eax]).DeviceExtension
