@@ -26,6 +26,7 @@ end;
 function IrpRead(pOurDevice:PDeviceObject; pIrp:PIrp):NTSTATUS; stdcall;
 var
   len: ULONG;
+  
 begin
   DbgPrint('IRP_MJ_READ', []);
   

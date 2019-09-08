@@ -39,7 +39,7 @@ StartIo proc pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
   .if eax == IRP_MJ_WRITE
     invoke DbgPrint, $CTA0("StartIo, IRP_MJ_WRITE")
     IoGetCurrentIrpStackLocation pIrp
-    Push (IO_STACK_LOCATION PTR [eax]).Parameters.Write._Length
+    push (IO_STACK_LOCATION PTR [eax]).Parameters.Write._Length
     pop dwLen
     
     mov eax, pdx

@@ -43,6 +43,7 @@ OnTimer proc uses ebx pDpc:PKDPC, pContext:PVOID, pArg1:PVOID, PArg2:PVOID
     mov eax, (DEVICE_OBJECT PTR [eax]).DeviceExtension
     lea eax, (OurDeviceExtension PTR [eax]).stQueue
     RemoveHeadList eax
+    
     ; CONTAINING_RECORD 
     sub eax, _IRP.Tail.Overlay.ListEntry
     mov bl, (_IRP PTR [eax]).Cancel
@@ -113,8 +114,7 @@ IrpIOCTL proc uses ebx ecx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
 
   mov eax, pIrp
   mov (_IRP PTR [eax]).IoStatus.Status, STATUS_SUCCESS
-  push 0
-  pop (_IRP PTR [eax]).IoStatus.Information 
+  and (_IRP PTR [eax]).IoStatus.Information, 0
   fastcall IofCompleteRequest, pIrp, IO_NO_INCREMENT
   mov eax, STATUS_SUCCESS
   ret

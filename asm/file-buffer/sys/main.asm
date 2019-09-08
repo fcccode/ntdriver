@@ -24,7 +24,6 @@ SYM_NAME word "\","D","o","s","D","e","v","i","c","e","s","\","M","y","D","r","i
 IrpOpenClose proc pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
   IoGetCurrentIrpStackLocation pIrp
   movzx eax, (IO_STACK_LOCATION PTR [eax]).MajorFunction
-
   .if eax == IRP_MJ_CREATE
     invoke DbgPrint, $CTA0("IRP_MJ_CREATE")
   .elseif eax == IRP_MJ_CLOSE
@@ -44,9 +43,7 @@ IrpReadWrite proc uses ebx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
   local dwLen:dword
   local pdx:PTR OurDeviceExtension
   
-  xor eax, eax
-  mov dwLen, eax
-
+  and dwLen, 0
   mov eax, pOurDevice
   push (DEVICE_OBJECT PTR [eax]).DeviceExtension
   pop pdx

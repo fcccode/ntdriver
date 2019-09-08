@@ -39,7 +39,7 @@ CsqInsertIrp proc uses ebx ecx pCsqInfo:PIO_CSQ, pIrp:PIRP
   
   invoke DbgPrint, $CTA0("CsqInsertIrp")
   
-  ;// CONTAINING_RECORD 
+  ; CONTAINING_RECORD 
   mov eax, pCsqInfo
   sub eax, OurDeviceExtension.stCsq
   mov pdx, eax
@@ -72,8 +72,7 @@ CsqCompleteCanceledIrp proc pCsqInfo:PIO_CSQ, pIrp:PIRP
 
   mov eax, pIrp
   mov (_IRP PTR [eax]).IoStatus.Status, STATUS_CANCELLED
-  push 0
-  pop (_IRP PTR [eax]).IoStatus.Information 
+  and (_IRP PTR [eax]).IoStatus.Information, 0
   fastcall IofCompleteRequest, eax, IO_NO_INCREMENT
   ret
 CsqCompleteCanceledIrp endp 
@@ -209,16 +208,14 @@ OnTimer proc uses ebx pDpc:PKDPC, pContext:PVOID, pArg1:PVOID, PArg2:PVOID
 
     .if bl != TRUE
       mov (_IRP PTR [eax]).IoStatus.Status, STATUS_SUCCESS
-      push 0
-      pop (_IRP PTR [eax]).IoStatus.Information
+      and (_IRP PTR [eax]).IoStatus.Information, 0
       fastcall IofCompleteRequest, eax, IO_NO_INCREMENT
       mov eax, STATUS_SUCCESS
       invoke DbgPrint, $CTA0("Complete Irp")
     .else
       mov (_IRP PTR [eax]).CancelRoutine, NULL
       mov (_IRP PTR [eax]).IoStatus.Status, STATUS_CANCELLED
-      push 0
-      pop (_IRP PTR [eax]).IoStatus.Information
+      and (_IRP PTR [eax]).IoStatus.Information, 0
       fastcall IofCompleteRequest, eax, IO_NO_INCREMENT
       mov eax, STATUS_CANCELLED
       invoke DbgPrint, $CTA0("Cancel Irp")
@@ -272,8 +269,7 @@ IrpIOCTL proc uses ebx pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
 
   mov eax, pIrp
   mov (_IRP PTR [eax]).IoStatus.Status, STATUS_SUCCESS
-  push 0
-  pop (_IRP PTR [eax]).IoStatus.Information 
+  and (_IRP PTR [eax]).IoStatus.Information, 0
   fastcall IofCompleteRequest, pIrp, IO_NO_INCREMENT
   mov eax, STATUS_SUCCESS
   ret

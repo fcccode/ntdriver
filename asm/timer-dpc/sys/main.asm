@@ -12,10 +12,10 @@ includelib c:\masm32\lib\wxp\i386\ntoskrnl.lib
 public DriverEntry
 
 OurDeviceExtension struct
-  pNextDev    PDEVICE_OBJECT ?
-  dwTimerCnt  DWORD          ?
-  stTimerObj  KTIMER         <>
-  stTimerDPC  KDPC           <>    
+  pNextDev   PDEVICE_OBJECT ?
+  dwTimerCnt DWORD          ?
+  stTimerObj KTIMER         <>
+  stTimerDPC KDPC           <>    
 OurDeviceExtension ends
 
 IOCTL_START equ CTL_CODE(FILE_DEVICE_UNKNOWN, 800h, METHOD_BUFFERED, FILE_ANY_ACCESS)

@@ -2,8 +2,7 @@ unit main;
 
 interface
   uses 
-    DDDK,
-    SysUtils;
+    DDDK;
     
   const 
     DEV_NAME = '\Device\MyDriver';

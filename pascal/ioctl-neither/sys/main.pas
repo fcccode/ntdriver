@@ -39,6 +39,7 @@ var
   len: ULONG;
   code: ULONG;
   psk: PIoStackLocation;
+
 begin
   len:= 0;
   psk:= IoGetCurrentIrpStackLocation(pIrp);

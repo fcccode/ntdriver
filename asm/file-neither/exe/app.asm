@@ -43,7 +43,7 @@ start:
   invoke ReadFile, hFile, offset szBuffer, 255, offset dwRet, 0
   invoke crt_printf, offset MSG_RD, offset szBuffer, dwRet
   invoke CloseHandle, hFile
-
   invoke ExitProcess, 0
+  
 end start
 

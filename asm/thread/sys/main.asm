@@ -74,14 +74,10 @@ IrpOpenClose proc pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
 IrpOpenClose endp
 
 IrpIOCTL proc pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
-  local dwLen: DWORD
   local pdx:PTR OurDeviceExtension
   local pBuf:DWORD
   local hThread:DWORD
   local pThread:PVOID
-
-  push 0
-  pop dwLen
 
   mov eax, pOurDevice
   push (DEVICE_OBJECT PTR [eax]).DeviceExtension
@@ -95,11 +91,11 @@ IrpIOCTL proc pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
     mov eax, pdx
     and (OurDeviceExtension PTR [eax]).bExit, 0
 
-    ;// user thread
+    ; user thread
     invoke PsCreateSystemThread, addr hThread, THREAD_ALL_ACCESS, NULL, -1, NULL, offset MyThread, pOurDevice
     
-    ;// system thread
-    ;//invoke PsCreateSystemThread, addr hThread, THREAD_ALL_ACCESS, NULL, NULL, NULL, offset MyThread, pOurDevice
+    ; system thread
+    ;invoke PsCreateSystemThread, addr hThread, THREAD_ALL_ACCESS, NULL, NULL, NULL, offset MyThread, pOurDevice
     
     .if eax == STATUS_SUCCESS
       mov eax, pdx
@@ -122,8 +118,7 @@ IrpIOCTL proc pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
 
   mov eax, pIrp
   mov (_IRP PTR [eax]).IoStatus.Status, STATUS_SUCCESS
-  push dwLen
-  pop (_IRP PTR [eax]).IoStatus.Information 
+  and (_IRP PTR [eax]).IoStatus.Information, 0
   fastcall IofCompleteRequest, pIrp, IO_NO_INCREMENT
   mov eax, STATUS_SUCCESS
   ret

@@ -2,9 +2,8 @@ unit main;
 
 interface
   uses 
-    DDDK,
-    SysUtils;
-    
+    DDDK;
+
   const 
     DEV_NAME = '\Device\MyDriver';
     SYM_NAME = '\DosDevices\MyDriver';
@@ -62,6 +61,7 @@ var
   hThread: Handle;
   status: NTSTATUS;
   psk: PIoStackLocation;
+
 begin
   psk:= IoGetCurrentIrpStackLocation(pIrp);
   code:= psk^.Parameters.DeviceIoControl.IoControlCode;

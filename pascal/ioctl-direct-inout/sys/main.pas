@@ -40,6 +40,7 @@ var
   dst: PChar;
   code: ULONG;
   psk: PIoStackLocation;
+
 begin
   len:= 0;
   psk:= IoGetCurrentIrpStackLocation(pIrp);

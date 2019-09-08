@@ -34,6 +34,7 @@ function IrpIOCTL(pOurDevice:PDeviceObject; pIrp:PIrp):NTSTATUS; stdcall;
 var
   psk: PIoStackLocation;
   code: ULONG;
+
 begin
   psk:= IoGetCurrentIrpStackLocation(pIrp);
   code:= psk^.Parameters.DeviceIoControl.IoControlCode;

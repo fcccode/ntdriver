@@ -17,7 +17,6 @@ MSG byte "Hello, world!",0
 
 .code
 Unload proc pOurDriver:PDRIVER_OBJECT
-  xor eax, eax
   ret
 Unload endp
 

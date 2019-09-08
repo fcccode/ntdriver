@@ -18,9 +18,9 @@ DEVNAME db "\\.\MyDriver",0
 ERR_MSG db "failed to open mydriver",0
 
 .data?
-hFile     dd ?
-dwRet     dd ?
-szBuffer  db 255 dup(?)
+hFile    dd ?
+dwRet    dd ?
+szBuffer db 255 dup(?)
 
 .code
 start:

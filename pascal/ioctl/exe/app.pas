@@ -22,6 +22,7 @@ var
   fd: DWORD;
   code: DWORD;
   dwRet: DWORD;
+
 begin
   fd:= CreateFile('\\.\MyDriver', GENERIC_READ or GENERIC_WRITE, FILE_SHARE_READ, Nil, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
   if (fd <> INVALID_HANDLE_VALUE) then

@@ -17,8 +17,8 @@ OurDeviceExtension struct
   szBuffer byte 255 dup(?)
 OurDeviceExtension ends
 
-IOCTL_GET  equ CTL_CODE(FILE_DEVICE_UNKNOWN, 800h, METHOD_OUT_DIRECT, FILE_ANY_ACCESS)
-IOCTL_SET  equ CTL_CODE(FILE_DEVICE_UNKNOWN, 801h, METHOD_IN_DIRECT, FILE_ANY_ACCESS)
+IOCTL_GET equ CTL_CODE(FILE_DEVICE_UNKNOWN, 800h, METHOD_OUT_DIRECT, FILE_ANY_ACCESS)
+IOCTL_SET equ CTL_CODE(FILE_DEVICE_UNKNOWN, 801h, METHOD_IN_DIRECT, FILE_ANY_ACCESS)
  
 .const
 DEV_NAME word "\","D","e","v","i","c","e","\","M","y","D","r","i","v","e","r",0
@@ -49,9 +49,7 @@ IrpIOCTL proc pOurDevice:PDEVICE_OBJECT, pIrp:PIRP
   local pdx:PTR OurDeviceExtension
   local pBuf:DWORD
 
-  push 0
-  pop dwLen
-
+  and dwLen, 0
   mov eax, pOurDevice
   push (DEVICE_OBJECT PTR [eax]).DeviceExtension
   pop pdx
