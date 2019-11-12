@@ -79,7 +79,6 @@ begin
     pOurDevice^.Flags:= pOurDevice^.Flags or DO_BUFFERED_IO;
     pOurDevice^.Flags:= pOurDevice^.Flags and not DO_DEVICE_INITIALIZING;
     Result:= IoCreateSymbolicLink(@szSymName, @suDevName);
-    Result:= STATUS_SUCCESS;
   end;
 end;
 end.
